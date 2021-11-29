@@ -1,13 +1,13 @@
 
 import java.util.*
-import kotlin.math.absoluteValue
 import kotlin.system.measureTimeMillis
 
 
-val pathMV : String = "C:/Users/asdf3/OneDrive - bwedu/Uni/3. Semester/Programmier Projekt/MV.fmi"
-val pathGermany : String = "C:/Users/asdf3/OneDrive - bwedu/Uni/3. Semester/Programmier Projekt/germany.fmi"
+const val pathMV : String = "C:/Users/asdf3/OneDrive - bwedu/Uni/3. Semester/Programmier Projekt/MV.fmi"
+const val pathGermany : String = "C:/Users/asdf3/OneDrive - bwedu/Uni/3. Semester/Programmier Projekt/germany.fmi"
+const val iterations : Int = 100000
 
-val GRAPH : Graph = Graph.Companion.parseGraph(pathMV)
+val GRAPH : Graph = Graph.parseGraph(pathMV)
 
 
 fun main(args: Array<String>) {
@@ -15,84 +15,67 @@ fun main(args: Array<String>) {
     println("Amount Nodes: " + GRAPH.amountNodes)
     println("Amount Edges: " + GRAPH.amountEdges)
 
-
-    /*val tupels : Array<Tupel?> = arrayOfNulls<Tupel>(GRAPH.amountNodes)
-    for (i in 0 until tupels.size){
-        tupels[i] = Tupel(GRAPH.nodeList[i], (10..500).random())
-    }*/
     val compareDist  : Comparator<Node> = compareBy { it.dist }
-    val pq = PriorityQueue<Node>(compareDist)
+    val pq = PriorityQueue<Node>(GRAPH.amountNodes, compareDist)
 
 
     // PriorityQueue
     println("\nPriorityQueue")
     val prioAdd = measureTimeMillis {
-        for (i in 0 until GRAPH.amountNodes) {
+        for (i in 0 until iterations) {
             GRAPH.nodeList[i].dist = (10..500).random()
             pq.add(GRAPH.nodeList[i])
         }
     }
-    println("PrioAdd: " + prioAdd)
+    println("PrioAdd: $prioAdd")
     var prioRem : Long = 0
     var prioReAdd : Long = 0
     var prioPull : Long = 0
     val prioMix = measureTimeMillis {
         for (k in 1..1){
-            for (i in 0 until 10) {
+            for (i in 0 until iterations) {
                 prioRem += measureTimeMillis { pq.remove(GRAPH.nodeList[i]) }
-                GRAPH.nodeList[i].dist = (10..GRAPH.nodeList[i].dist).random()
+                GRAPH.nodeList[i].dist = (0..GRAPH.nodeList[i].dist).random()
                 prioReAdd += measureTimeMillis { pq.add(GRAPH.nodeList[i]) }
             }
-            for (i in 0 until 10) {
+            for (i in 0 until iterations) {
                 prioPull += measureTimeMillis { pq.remove() }
             }
         }
     }
-    println("prioRem: " + prioRem)
-    println("prioReAdd: " + prioReAdd)
-    println("prioPull: " + prioPull)
+    println("prioRem: $prioRem")
+    println("prioReAdd: $prioReAdd")
+    println("prioMix: $prioMix")
+    println("prioPull: $prioPull")
+    println("TOTAL: ${prioAdd + prioMix + prioPull}")
 
 
 
     // YoungTableau
     println("\nYoungTableau")
-    var yt : YoungTableau = YoungTableau(GRAPH.amountNodes)
+    val yt : YoungTableau = YoungTableau(GRAPH.amountNodes)
     val ytAdd : Long = measureTimeMillis {
-        for (i in 0 until /*GRAPH.amountNodes*/ 10000) {
+        for (i in 0 until iterations) {
             GRAPH.nodeList[i].dist = (100..500).random()
             yt.insert(GRAPH.nodeList[i])
         }
-        /*for (i in (0 until 4)){
-            print(GRAPH.nodeList[yt.table[5][2][2][4].id].pos[i].toString() + ", ")
-        }
-        println()*/
     }
-    println("ytAdd: " + ytAdd)
-    var ytRem : Long = 0
-    var ytReAdd : Long = 0
+    println("ytAdd: $ytAdd")
     var ytPull : Long = 0
     val ytMix : Long = measureTimeMillis {
-        for (k in 1..1){
-            for (i in 0 until 1) {
-                // TODO: update Node dist
-                //ytRem += measureTimeMillis { pq.remove(GRAPH.nodeList[i]) }
-                GRAPH.nodeList[i].dist = (10/*..GRAPH.nodeList[i].dist).random()*/)
-                //ytReAdd += measureTimeMillis { pq.add(GRAPH.nodeList[i]) }
-                yt.manipulate(GRAPH.nodeList[i].pos, 10)
-                for (j in (0 until 4)){
-                    print(GRAPH.nodeList[i].pos[j].toString() + ", ")
-                }
-                println("\n${GRAPH.nodeList[i].dist}")
-                println(yt.table[1][1][1][1].dist)
+        for (k in 1..1) {
+            for (i in 0 until iterations) {
+                GRAPH.nodeList[i].dist = (1..GRAPH.nodeList[i].dist).random()
+                yt.manipulate(GRAPH.nodeList[i].pos, GRAPH.nodeList[i].dist)
             }
-            for (i in 0 until 100) {
-                ytPull += measureTimeMillis { print(yt.pull().dist.toString() + ", ") }
+            for (i in 0 until iterations) {
+                ytPull += measureTimeMillis { yt.pull().dist.toString() }
             }
         }
     }
-    println("ytRem: " + ytRem)
-    println("ytReAdd: " + ytReAdd)
-    println("ytPull: " + ytPull)
+    println("ytMix: $ytMix")
+    println("ytPull: $ytPull")
+    println("TOTAL: ${ytAdd + ytMix + ytPull}")
 
 
 

@@ -31,7 +31,7 @@ class YoungTableau(val nodeAmount : Int) {
             for (x2 in (1 until size)) {
                 for (x3 in (1 until size)) {
                     for (x4 in (1 until size)) {
-                        //table.index(arrayOf(x1, x2, x3, x4)) = Node(0, 0.0, 0.0, Int.MAX_VALUE, Array<Int>(dim) { -2 } )
+                        table[x1][x2][x3][x4] = Node(0, 0.0, 0.0, Int.MAX_VALUE, Array<Int>(dim) { -2 } )
                     }
                 }
             }
@@ -43,8 +43,7 @@ class YoungTableau(val nodeAmount : Int) {
      */
     fun insert(node : Node) {
         if (isFull()) {
-            println("ChaosNode ist node id ${node.id}")
-            throw Exception("YoungTableau ist voll? Bruder du hast mies verkackt. Probiers doch mal mit einem größeren YoungTableau.")
+            throw Exception("YoungTableau ist voll Bei node ${node.id}? Bruder du hast mies verkackt. Probiers doch mal mit einem größeren YoungTableau.")
         }
         insertAt(node, Array<Int>(dim) { size-2 })
     }
@@ -63,25 +62,15 @@ class YoungTableau(val nodeAmount : Int) {
         //GRAPH.nodeList[node.id].pos = Array(dim) { size - 2 }
         var currentPos : Array<Int> = atPosition
 
-        print("currentpos: ")
-        for(i in (0..3)){
-            print(currentPos[i].toString() + ", ")
-        }
-        println("")
 
-
-        //println("Currently inserting node with distance ${node.dist}")
         for(iteration in (0..dim*size)) {
 
             // calculate diffList
             val diffList : Array<Int> = Array(dim) { 0 }
             val currentDist = node.dist
-            //println("Nachbarnchecken:")
-            //println("aktuelle Position " + pos[0] + ", " + pos[1] + ", " + pos[2] + ", " + pos[3] )
             for (i in (0 until dim)) {
                 currentPos[i]--
                 diffList[i] = table[currentPos[0]][currentPos[1]][currentPos[2]][currentPos[3]].dist - currentDist
-                //println("Das ist der $i te Nachbar bei " + pos[0] + ", " + pos[1] + ", " + pos[2] + ", " + pos[3] + " mit diffList " + table[pos[0]][pos[1]][pos[2]][pos[3]].dist.toString() )
                 currentPos[i]++
             }
 
@@ -131,7 +120,6 @@ class YoungTableau(val nodeAmount : Int) {
             for (i in (0 until dim)) {
                 pos[i]++
                 diffList[i] = currentDist - table[pos[0]][pos[1]][pos[2]][pos[3]].dist
-                //println(diffList[i].toString() + ", ")
                 pos[i]--
             }
 
@@ -173,34 +161,13 @@ class YoungTableau(val nodeAmount : Int) {
     }
 
 
-    // funktioniert nur im 2-dimensionalen
-    fun printYT() {
-        /*for (i in (0 until size)){
-            print("[ ")
-            for (j in (0 until size)){
-                print(table[i][j].dist.toString() + ", ")
-            }
-            println(" ]")
-        }
-        print("\n\n")*/
-    }
-
     fun isFull() : Boolean {
-        if (table[size-2][size-2][size-2][size-2].dist != Int.MAX_VALUE) {
-            println("ist eigentlich voll lol")
-            println("sollte fassen: ${(size-2).toDouble().pow(dim)}")
-            println(table[5][1][1][1].dist)
-            println(table[1][5][1][1].dist)
-            println(table[1][1][20][1].dist)
-            println(table[1][1][1][20].dist)
-        }
         return table[size-2][size-2][size-2][size-2].dist != Int.MAX_VALUE
     }
 
     fun isEmpty() : Boolean {
         return table[1][1][1][1].dist == Int.MAX_VALUE
     }
-
 
 
 }
